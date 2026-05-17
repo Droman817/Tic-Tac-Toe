@@ -65,7 +65,7 @@ public class App {
 
                     System.out.println("Player " + currentPlayer + " wins!");
 
-                    log.addWin(currentPlayer);
+                    log.recordWin(currentPlayer);
 
                     break;
                 }
@@ -76,7 +76,7 @@ public class App {
 
                     System.out.println("It's a tie!");
 
-                    log.addTie();
+                    log.recordTie();
 
                     break;
                 }
