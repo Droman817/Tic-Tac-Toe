@@ -1,74 +1,148 @@
+package org.example;
+
 import java.util.Scanner;
 
-public class Main {
+public class App {
+
     public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
+
         GameLog log = new GameLog();
 
-        String firstPlayer = "X";  // initial turn
         boolean playAgain = true;
 
-        while (playAgain) {
-            Board board = new Board(); // or however your board is initialized
-            String winner = playGame(scanner, board, firstPlayer);
+        System.out.println("Welcome to Tic-Tac-Toe!");
 
-            if (winner.equals("Tie")) log.addTie();
-            else log.addWin(winner);
+        while (playAgain) {
+
+            System.out.println();
+            System.out.println("What kind of game would you like to play?");
+            System.out.println();
+            System.out.println("1. Human vs. Human");
+            System.out.println("2. Human vs. Computer");
+            System.out.println("3. Computer vs. Human");
+            System.out.println();
+
+            int selection = getMenuChoice(scanner);
+
+            Board board = new Board();
+
+            ComputerPlayer computer = new ComputerPlayer();
+
+            String currentPlayer = "X";
+
+            boolean vsComputer = selection == 2 || selection == 3;
+
+            String computerPlayer = selection == 3 ? "X" : "O";
+
+            while (true) {
+
+                board.display();
+
+                int move;
+
+                if (vsComputer && currentPlayer.equals(computerPlayer)) {
+
+                    move = computer.getMove(
+                            board,
+                            computerPlayer,
+                            computerPlayer.equals("X") ? "O" : "X"
+                    );
+
+                    System.out.println("Computer chooses " + move);
+
+                } else {
+
+                    move = getValidMove(scanner, board);
+                }
+
+                board.makeMove(move, currentPlayer);
+
+                if (board.checkWinner()) {
+
+                    board.display();
+
+                    System.out.println("Player " + currentPlayer + " wins!");
+
+                    log.addWin(currentPlayer);
+
+                    break;
+                }
+
+                if (board.isFull()) {
+
+                    board.display();
+
+                    System.out.println("It's a tie!");
+
+                    log.addTie();
+
+                    break;
+                }
+
+                currentPlayer = currentPlayer.equals("X") ? "O" : "X";
+            }
 
             log.printLog();
 
-            System.out.print("\nWould you like to play again (yes/no)? ");
+            System.out.print("Would you like to play again (yes/no)? ");
+
             String response = scanner.nextLine().trim().toLowerCase();
-            if (response.equals("yes")) {
-                // swap first player if there was a winner
-                if (!winner.equals("Tie")) firstPlayer = winner.equals("X") ? "O" : "X";
-                System.out.println("\nGreat! " + firstPlayer + " will go first this time!\n");
-            } else {
+
+            if (!response.equals("yes")) {
                 playAgain = false;
             }
         }
 
         log.saveToFile();
+
         scanner.close();
+
+        System.out.println("Goodbye!");
     }
 
-    // Example playGame method: you might need to adapt this to your existing Board/Game methods
-    private static String playGame(Scanner scanner, Board board, String currentPlayer) {
+    private static int getMenuChoice(Scanner scanner) {
+
         while (true) {
-            board.display(); // display the board
 
-            System.out.print("What is your move? ");
-            int move = getValidMove(scanner, board);
+            System.out.print("What is your selection? ");
 
-            board.makeMove(move, currentPlayer);
+            try {
 
-            if (board.checkWinner()) {
-                board.display();
-                System.out.println("\nPlayer " + currentPlayer + " wins!");
-                return currentPlayer;
+                int choice = Integer.parseInt(scanner.nextLine());
+
+                if (choice >= 1 && choice <= 3) {
+                    return choice;
+                }
+
+            } catch (Exception e) {
+
             }
 
-            if (board.isFull()) {
-                board.display();
-                System.out.println("\nIt's a tie!");
-                return "Tie";
-            }
-
-            currentPlayer = currentPlayer.equals("X") ? "O" : "X"; // switch turn
+            System.out.println("Invalid selection.");
         }
     }
 
     private static int getValidMove(Scanner scanner, Board board) {
-        int move = -1;
+
         while (true) {
+
+            System.out.print("What is your move? ");
+
             try {
-                move = Integer.parseInt(scanner.nextLine());
-                if (board.isValidMove(move)) break;
-                else System.out.print("Invalid move. Try again: ");
-            } catch (NumberFormatException e) {
-                System.out.print("Please enter a number between 1-9: ");
+
+                int move = Integer.parseInt(scanner.nextLine());
+
+                if (board.isValidMove(move)) {
+                    return move;
+                }
+
+            } catch (Exception e) {
+
             }
+
+            System.out.println("That is not a valid move! Try again.");
         }
-        return move;
     }
 }

@@ -1,59 +1,97 @@
+package org.example;
+
 public class Board {
 
-    private char[] cells;
+    private String[] board = {
+            "1", "2", "3",
+            "4", "5", "6",
+            "7", "8", "9"
+    };
 
-    public Board() {
-        cells = new char[9];
-        for (int i = 0; i < 9; i++) {
-            cells[i] = Character.forDigit(i + 1, 10);
-        }
+    public void display() {
+        System.out.println();
+        System.out.println(" " + board[0] + " | " + board[1] + " | " + board[2]);
+        System.out.println("---+---+---");
+        System.out.println(" " + board[3] + " | " + board[4] + " | " + board[5]);
+        System.out.println("---+---+---");
+        System.out.println(" " + board[6] + " | " + board[7] + " | " + board[8]);
+        System.out.println();
     }
 
-    public boolean makeMove(int position, char player) {
-        if (position < 1 || position > 9) {
-            return false;
-        }
-
-        if (cells[position - 1] == 'X' || cells[position - 1] == 'O') {
-            return false;
-        }
-
-        cells[position - 1] = player;
-        return true;
+    public boolean isValidMove(int move) {
+        return move >= 1 && move <= 9 &&
+                !board[move - 1].equals("X") &&
+                !board[move - 1].equals("O");
     }
 
-    public boolean checkWin() {
-        int[][] winPositions = {
-                {0,1,2}, {3,4,5}, {6,7,8}, // rows
-                {0,3,6}, {1,4,7}, {2,5,8}, // columns
-                {0,4,8}, {2,4,6}           // diagonals
+    public void makeMove(int move, String player) {
+        board[move - 1] = player;
+    }
+
+    public void undoMove(int move) {
+        board[move - 1] = String.valueOf(move);
+    }
+
+    public boolean checkWinner() {
+
+        int[][] combos = {
+                {0,1,2},
+                {3,4,5},
+                {6,7,8},
+                {0,3,6},
+                {1,4,7},
+                {2,5,8},
+                {0,4,8},
+                {2,4,6}
         };
 
-        for (int[] combo : winPositions) {
-            if (cells[combo[0]] == cells[combo[1]] &&
-                cells[combo[1]] == cells[combo[2]]) {
+        for (int[] combo : combos) {
+
+            if (board[combo[0]].equals(board[combo[1]]) &&
+                    board[combo[1]].equals(board[combo[2]])) {
+
                 return true;
             }
         }
+
         return false;
     }
 
-    public boolean isDraw() {
-        for (char cell : cells) {
-            if (cell != 'X' && cell != 'O') {
+    public boolean isFull() {
+
+        for (String spot : board) {
+
+            if (!spot.equals("X") && !spot.equals("O")) {
                 return false;
             }
         }
+
         return true;
     }
 
-    public void printBoard() {
-        System.out.println();
-        System.out.println("  " + cells[0] + "  |  " + cells[1] + "  |  " + cells[2]);
-        System.out.println("-----+-----+-----");
-        System.out.println("  " + cells[3] + "  |  " + cells[4] + "  |  " + cells[5]);
-        System.out.println("-----+-----+-----");
-        System.out.println("  " + cells[6] + "  |  " + cells[7] + "  |  " + cells[8]);
-        System.out.println();
+    public boolean isEmpty() {
+
+        for (String spot : board) {
+
+            if (spot.equals("X") || spot.equals("O")) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public int moveCount() {
+
+        int count = 0;
+
+        for (String spot : board) {
+
+            if (spot.equals("X") || spot.equals("O")) {
+                count++;
+            }
+        }
+
+        return count;
     }
 }
